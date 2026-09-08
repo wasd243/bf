@@ -131,19 +131,3 @@ pub fn parse(src: &[u8], pos: &mut usize) -> Result<Vec<BrainFuck>, BrainFuckErr
 
     Ok(bfs)
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    const BF_SRC: &str = ">+[<]>-,[<+>-]<.";
-
-    #[test]
-    fn test_parse() {
-        let chars = BF_SRC.as_bytes();
-        let mut pos = 0;
-        let bfs = parse(chars, &mut pos).unwrap();
-
-        println!("{:#?}", bfs);
-    }
-}
