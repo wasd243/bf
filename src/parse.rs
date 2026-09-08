@@ -44,8 +44,12 @@ impl Context {
 
                 BrainFuck::Input => unsafe {
                     let mut byte = [0u8; 1];
-                    stdin().read_exact(&mut byte)?;
-                    *self.ptr = byte[0];
+                    match stdin().read(&mut byte) {
+                        Ok(1) => *self.ptr = byte[0],
+                        Ok(0) => *self.ptr = 0,
+                        Err(_) => *self.ptr = 0,
+                        _ => {}
+                    }
                 },
 
                 BrainFuck::LoopBegin => unsafe {
