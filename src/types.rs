@@ -1,10 +1,11 @@
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Context {
-    pub ptr: usize,
+    pub ptr: *mut u8,
     pub cells: Vec<u8>,
+    pub jump_table: Vec<usize>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 pub enum BrainFuck {
     IncPtr,
     DecPtr,
