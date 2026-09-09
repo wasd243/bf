@@ -8,7 +8,7 @@ pub struct Context {
     pub jump_table: Vec<usize>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub enum BrainFuck {
     IncPtr,
     DecPtr,
@@ -32,4 +32,6 @@ impl fmt::Display for BrainFuckErr {
     }
 }
 
-impl Error for BrainFuckErr {/* empty */}
+impl Error for BrainFuckErr {
+    /* empty */
+}

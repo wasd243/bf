@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1"
-clap = { version = "4", features = ["derive", "default"]}
+clap = { version = "4", features = ["derive"]}
 
 [profile.release]
 opt-level = 3
