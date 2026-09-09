@@ -37,4 +37,10 @@ mod tests {
     fn unused_loop2() {
         test_preproc!(BF_SRC3);
     }
+
+    const BF_SRC4: &str = "[This is a comment---the bf interpreter won't parse normal en comment or other unicode like 中文]";
+    #[test]
+    fn unused_loop3() {
+        test_preproc!(BF_SRC4);
+    }
 }
