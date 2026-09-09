@@ -17,7 +17,7 @@ struct Args {
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();
     let src = fs::read_to_string(&args.file)?;
-    let bfs = parse(src.as_bytes(), &mut 0).unwrap();
+    let bfs = parse(src.as_bytes(), &mut 0)?;
     let mut ctx = Context::new();
     ctx.run(bfs)?;
 

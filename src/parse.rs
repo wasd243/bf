@@ -43,6 +43,7 @@ impl Context {
                 },
 
                 BrainFuck::Input => unsafe {
+                    // we could not use `std::io::stdin().read_exact()` here
                     let mut byte = [0u8; 1];
                     match stdin().read(&mut byte) {
                         Ok(1) => *self.ptr = byte[0],
