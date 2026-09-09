@@ -1,6 +1,6 @@
-use std::io::{stdin, stdout, Read, Write};
+use crate::{Context, PreprocBrainFuck};
+use std::io::{Read, Write, stdin, stdout};
 use std::slice;
-use crate::{BrainFuck, Context};
 
 impl Context {
     pub fn new() -> Self {
@@ -15,34 +15,34 @@ impl Context {
     }
 
     /// run the brainfuck code
-    pub fn run(&mut self, bfs: Vec<BrainFuck>) -> anyhow::Result<()> {
+    pub fn run(&mut self, bfs: Vec<PreprocBrainFuck>) -> anyhow::Result<()> {
         self.ptr = self.cells.as_mut_ptr();
         self.build_jump_table(&bfs)?;
 
         let mut ip = 0;
         while ip < bfs.len() {
             match bfs[ip] {
-                BrainFuck::IncPtr => unsafe {
-                    self.ptr = self.ptr.add(1);
+                PreprocBrainFuck::IncPtr(x) => unsafe {
+                    self.ptr = self.ptr.add(x);
                 },
 
-                BrainFuck::DecPtr => unsafe {
-                    self.ptr = self.ptr.sub(1);
+                PreprocBrainFuck::DecPtr(x) => unsafe {
+                    self.ptr = self.ptr.sub(x);
                 },
 
-                BrainFuck::IncCell => unsafe {
-                    *self.ptr = (*self.ptr).wrapping_add(1);
+                PreprocBrainFuck::IncCell(x) => unsafe {
+                    *self.ptr = (*self.ptr).wrapping_add(x as u8);
                 },
 
-                BrainFuck::DecCell => unsafe {
-                    *self.ptr = (*self.ptr).wrapping_sub(1);
+                PreprocBrainFuck::DecCell(x) => unsafe {
+                    *self.ptr = (*self.ptr).wrapping_sub(x as u8);
                 },
 
-                BrainFuck::Output => unsafe {
+                PreprocBrainFuck::Output => unsafe {
                     stdout().write_all(slice::from_ref(&*self.ptr))?;
                 },
 
-                BrainFuck::Input => unsafe {
+                PreprocBrainFuck::Input => unsafe {
                     // we could not use `std::io::stdin().read_exact()` here
                     let mut byte = [0u8; 1];
                     match stdin().read(&mut byte) {
@@ -53,13 +53,13 @@ impl Context {
                     }
                 },
 
-                BrainFuck::LoopBegin => unsafe {
+                PreprocBrainFuck::LoopBegin => unsafe {
                     if *self.ptr == 0 {
                         ip = self.jump_table[ip];
                     }
                 },
 
-                BrainFuck::LoopEnd => unsafe {
+                PreprocBrainFuck::LoopEnd => unsafe {
                     if *self.ptr != 0 {
                         ip = self.jump_table[ip];
                     }
@@ -72,14 +72,14 @@ impl Context {
     }
 
     /// build jump table for loop detection
-    fn build_jump_table(&mut self, bfs: &[BrainFuck]) -> anyhow::Result<()> {
+    fn build_jump_table(&mut self, bfs: &[PreprocBrainFuck]) -> anyhow::Result<()> {
         let mut stack = Vec::new();
         let mut jump_points = vec![0; bfs.len()];
         for (i, bf) in bfs.iter().enumerate() {
             match bf {
-                BrainFuck::LoopBegin => stack.push(i),
-                BrainFuck::LoopEnd => {
-                    let begin = stack.pop().unwrap();
+                PreprocBrainFuck::LoopBegin => stack.push(i),
+                PreprocBrainFuck::LoopEnd => {
+                    let begin = stack.pop().unwrap_or_default();
                     jump_points[begin] = i;
                     jump_points[i] = begin;
                 }

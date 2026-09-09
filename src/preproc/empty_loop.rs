@@ -12,31 +12,33 @@ impl Preproc {
     pub fn preproc(&mut self, bfs: Vec<BrainFuck>) -> Result<Vec<BrainFuck>> {
         let mut result = Vec::new();
         let mut current_loop = Vec::new();
-        let mut in_loop = false;
+        let mut depth: usize = 0;
 
         for bf in bfs {
             if bf == BrainFuck::LoopBegin {
-                in_loop = true;
-                current_loop.clear();
+                if depth == 0 {
+                    current_loop.clear();
+                }
+                depth += 1;
                 current_loop.push(bf);
                 continue;
             }
 
-            if in_loop {
+            if depth > 0 {
                 current_loop.push(bf);
 
                 if bf == BrainFuck::LoopEnd {
-                    // excluding the loop beginning and ending
-                    let loop_content = current_loop.clone();
-                    if !check_loop(loop_content[1..loop_content.len() - 1].to_vec())
-                        && !clean_empty_loop(&loop_content)
-                        && !check_loop_has_same_inc_or_sub(&loop_content)
-                    {
-                        result.extend(current_loop.clone());
+                    depth -= 1;
+                    if depth == 0 {
+                        let loop_content = current_loop.clone();
+                        if !check_loop(loop_content[1..loop_content.len() - 1].to_vec())
+                            && !clean_empty_loop(&loop_content)
+                            && !check_loop_has_same_inc_or_sub(&loop_content)
+                        {
+                            result.extend(current_loop.clone());
+                        }
+                        current_loop.clear();
                     }
-
-                    in_loop = false;
-                    current_loop.clear();
                 }
 
                 continue;
