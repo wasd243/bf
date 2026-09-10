@@ -33,7 +33,6 @@ impl Preproc {
                         let loop_content = current_loop.clone();
                         if !check_loop(loop_content[1..loop_content.len() - 1].to_vec())
                             && !clean_empty_loop(&loop_content)
-                            && !check_loop_has_same_inc_or_sub(&loop_content)
                         {
                             result.extend(current_loop.clone());
                         }
@@ -68,17 +67,6 @@ fn check_loop(bf_loop: Vec<BrainFuck>) -> bool {
     }
 
     increment_count == decrement_count
-}
-
-fn check_loop_has_same_inc_or_sub(bf_loop: &Vec<BrainFuck>) -> bool {
-    // check the:
-    // ```brainfuck
-    // [++++++]
-    // [------]
-    // ```
-    matches!(bf_loop.as_slice(),
-        [BrainFuck::LoopBegin, middle @ .., BrainFuck::LoopEnd]
-        if middle.iter().all(|bf| matches!(bf, BrainFuck::IncCell) || matches!(bf, BrainFuck::DecCell)))
 }
 
 fn clean_empty_loop(bf_loop: &Vec<BrainFuck>) -> bool {
