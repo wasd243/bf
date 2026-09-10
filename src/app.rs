@@ -43,10 +43,8 @@ pub(super) fn build_app() -> Result<()> {
     Ok(())
 }
 
-/// Some specific handling for macOS
-#[cfg(target_os = "macos")]
 fn redirect_stdin(path: &str) -> Result<()> {
-    use libc::{O_RDONLY, STDIN_FILENO, close, dup2, open};
+    use libc::{O_RDONLY, close, dup2, open};
 
     let path = ffi::CString::new(path)?;
 
@@ -56,34 +54,12 @@ fn redirect_stdin(path: &str) -> Result<()> {
             anyhow::bail!("[BF]failed to open input file");
         }
 
-        if dup2(fd, STDIN_FILENO) == -1 {
+        if dup2(fd, 0) == -1 {
             close(fd);
             anyhow::bail!("[BF]failed to redirect stdin");
         }
 
         close(fd);
-    }
-
-    Ok(())
-}
-
-/// Use libc on non-macOS platforms
-#[cfg(not(target_os = "macos"))]
-use libc::freopen;
-
-#[cfg(not(target_os = "macos"))]
-unsafe extern "C" {
-    static mut stdin: *mut libc::FILE;
-}
-
-#[cfg(not(target_os = "macos"))]
-fn redirect_stdin(path: &str) -> Result<()> {
-    let path = ffi::CString::new(path)?;
-
-    unsafe {
-        if freopen(path.as_ptr(), c"r".as_ptr(), stdin).is_null() {
-            anyhow::bail!("[BF]freopen failed");
-        }
     }
 
     Ok(())
