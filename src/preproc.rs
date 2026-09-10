@@ -41,28 +41,16 @@ mod tests {
         test_preproc!(BF_SRC);
     }
 
-    const BF_SRC2: &str = "[++++++]";
+    const BF_SRC2: &str = "[This is a comment---the bf interpreter won't parse normal en +++ comment or other unicode like 中文 の emoji like 😀 or other thing like \n]";
     #[test]
-    fn unused_loop() {
+    fn unused_loop3() {
         test_preproc!(BF_SRC2);
     }
 
-    const BF_SRC3: &str = "[------------=========]";
-    #[test]
-    fn unused_loop2() {
-        test_preproc!(BF_SRC3);
-    }
-
-    const BF_SRC4: &str = "[This is a comment---the bf interpreter won't parse normal en comment or other unicode like 中文 の emoji like 😀 or other thing like \n]";
-    #[test]
-    fn unused_loop3() {
-        test_preproc!(BF_SRC4);
-    }
-
-    const BF_SRC5: &str = "[------++>+]";
+    const BF_SRC3: &str = "[------++>+]";
     #[test]
     fn output_converted_or() {
-        let bfs = parse(BF_SRC5.as_bytes(), &mut 0).unwrap();
+        let bfs = parse(BF_SRC3.as_bytes(), &mut 0).unwrap();
         let bfs = bf_to_pbf(Preproc::new().preproc(bfs).unwrap());
         println!("{:?}", bfs);
         assert_eq!(bfs.len(), 6);
